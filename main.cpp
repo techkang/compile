@@ -58,7 +58,7 @@ char *check(char *s, int *num, char *split) {
                     s--;
                     break;
                 }
-                printf("Match error!\n");
+                printf("Unknown control sequence!\n");
                 return s;
             case '(':
                 *num++ = 10;
@@ -87,7 +87,7 @@ char *check(char *s, int *num, char *split) {
                     *num++ = 8;
                     break;
                 }
-                printf("Match error!\n");
+                printf("Unknown token!\n");
                 return s;
         }
     }
@@ -104,14 +104,14 @@ int main() {
     char split[200] = "";
     int num[100];
     FILE *fp;
-    char testfile[100] = "../information/test/test00.txt";
-    for (int i = 1; i < 12; i++) {
+    char testfile[] = "../information/test/test00.txt";
+    for (int i = 1; i < 100; i++) {
         testfile[24] = char(i / 10 + '0');
         testfile[25] = char(i % 10 + '0');
         printf("test%d:  ",i);
         if ((fp = fopen(testfile, "r")) == nullptr) {
             printf("Open file filed!");
-            exit(0);
+            break;
         }
         fgets(s, 100, fp);
         printf("%s", s);
@@ -121,7 +121,7 @@ int main() {
          * }:4  \int:5   \sum:6    \blank:7
          * id:8 num:9   (:10    ):11
          * */
-        char dict[100] = "$:0  _:1     ^:2     {:3     }:4  \\int:5   \\sum:6"
+        char dict[] = "$:0  _:1     ^:2     {:3     }:4  \\int:5   \\sum:6"
                          "    \\blank:7 id:8 num:9   (:10    ):11";
         char *result = check(s, num, split);
         if (result== nullptr){
@@ -141,6 +141,7 @@ int main() {
                 printf("%c",*p);
                 p++;
             }
+            printf("\n\n");
         }
 
     }
