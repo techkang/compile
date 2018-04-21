@@ -123,10 +123,10 @@ bool match(int *num) {
     int stack[100], height = -1, i = 0, temp, length;
     stack[++height] = B;
     num++;
-    while (*num != 0) {
+    while (*num != 0 || height>0) {
         if ((stack[height]) > 19) {
             if (table[stack[height] - 20][*num][0] == 0) {
-                printf("error!");
+                printf("error!\n");
                 return false;
             } else {
                 temp = stack[height] - 20;
@@ -150,14 +150,19 @@ bool match(int *num) {
                         printf("Move in: on the top of the stack:%d (epsilon).\n", stack[height]);
                         stack[height--] = 0;
                     } else {
-                        printf("Match error!\n\n");
+                        printf("Match error!\n");
                         return false;
                     }
                 }
             }
         }
     }
-    return true;
+    if(height==0){
+        return true;
+    }
+    else{
+        return false;
+    }
 }
 
 bool cifa_wenfa(char *s, char *split, int num[][100]) {
