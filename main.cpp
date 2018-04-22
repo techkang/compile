@@ -1,3 +1,6 @@
+//
+// Created by ksc on 18-4-22.
+//
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -75,6 +78,7 @@ char *check(char *s, int *num, char *split) {
                 *split++ = *s;
                 break;
             case ' ':
+            case '\n':
                 break;
             default:
                 if (*s >= 48 && *s < 58) {
@@ -132,16 +136,16 @@ bool print_info(int *stack, int *num, bool flag) {
                         {"C"}};
     p = stack;
     do {
-        printf("%s\t", map[*p++]);
+        printf("%s ", map[*p++]);
     } while (*p);
     if (flag) {
-        printf("%s\t\t\t%s\t", map[*p], map[*num++]);
+        printf("%s \t%s ", map[*p], map[*num++]);
     } else {
-        printf("\t\t");
+        printf("\t");
     }
     p = num;
     do {
-        printf("%s\t", map[*p]);
+        printf("%s ", map[*p]);
     } while (*p++);
     printf("\n");
 }
@@ -152,6 +156,18 @@ bool match(int *num) {
      * id:8 num:9   (:10    ):11    _^:12   epsilon:13
      * */
     /* S:0  B:1     C:3     D:2
+     * */
+    /* S -> $ B $
+     * B -> DC | \int{B}{B}{B}DC | \sum{B}{B}{B}DC | id DC | num DC | \blank DC | (B)DC
+     * D -> -^{B}D | ^{B}D | _{B}D | B | epsilon
+     * C -> BDC | epsilon
+     * ====================
+     * first(B) = { \int, \sum, id, num, \blank, ( }
+     * first(D) = { epsilon, _, ^, _^ }
+     * first(C) = { \int, \sum, \id, num, \blank, (, epsilon }
+     * first(S) = { $ }
+     *
+     * follow(B) = follow(D) = follow(C) = { epsilon, $, }, ), id, num, \blank, \int, \sum }
      * */
     int S = 20, B = 21, C = 23, D = 22;
     char map[25][10] = {{"$"},
