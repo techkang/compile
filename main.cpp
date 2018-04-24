@@ -123,7 +123,7 @@ bool print_info(int *stack, int *num, bool flag) {
                         {"("},
                         {")"},
                         {"_^"},
-                        {"E"},
+                        {"ε"},
                         {""},
                         {""},
                         {""},
@@ -139,9 +139,9 @@ bool print_info(int *stack, int *num, bool flag) {
         printf("%s ", map[*p++]);
     } while (*p);
     if (flag) {
-        printf("%s \t%s ", map[*p], map[*num++]);
+        printf("%s \t\t%s ", map[*p], map[*num++]);
     } else {
-        printf("\t");
+        printf("\t\t");
     }
     p = num;
     do {
@@ -158,18 +158,16 @@ bool match(int *num) {
     /* S:0  B:1     C:3     D:2
      * */
     /* S -> $ B $
-     * B -> DC | \int{B}{B}{B}DC | \sum{B}{B}{B}DC | id DC | num DC | \blank DC | (B)DC
-     * D -> -^{B}D | ^{B}D | _{B}D | B | epsilon
-     * C -> BDC | epsilon
+     * B ->  \int{B}{B}{B}D | \sum{B}{B}{B}D | id D | num D | \blank D | (B)D
+     * D -> _^{B}D | ^{B}D | _{B}D | BD | epsilon
      * ====================
      * first(B) = { \int, \sum, id, num, \blank, ( }
-     * first(D) = { epsilon, _, ^, _^ }
-     * first(C) = { \int, \sum, \id, num, \blank, (, epsilon }
+     * first(D) = { \int, \sum, id, num, \blank, (, epsilon, _, ^, _^ }
      * first(S) = { $ }
      *
-     * follow(B) = follow(D) = follow(C) = { epsilon, $, }, ), id, num, \blank, \int, \sum }
+     * follow(D)  = { epsilon, $, }, ), id, num, \blank, \int, \sum, ( }
      * */
-    int S = 20, B = 21, C = 23, D = 22;
+    int S = 20, B = 21, D = 22;
     char map[25][10] = {{"$"},
                         {"_"},
                         {"^"},
@@ -183,7 +181,7 @@ bool match(int *num) {
                         {"("},
                         {")"},
                         {"_^"},
-                        {"E"},
+                        {"ε"},
                         {""},
                         {""},
                         {""},
@@ -195,20 +193,19 @@ bool match(int *num) {
                         {"D"},
                         {"C"}};
     int table[4][14][14] = {{{3, 0, B, 0}},
-                            {{0},     {0},                {0},                {0},     {0},     {12, 5, 3, B, 4, 3, B, 4, 3, B, 4, D, C}, {12, 6, 3, B, 4, 3, B, 4, 3, B, 4, D, C}, {3, 7, D, C}, {3, 8, D, C}, {3, 9, D, C}, {5, 10, B, 11, D, C}, {0},     {8, 12, 3, B, 4, 3, B, 4, D}, {0}},
-                            {{1, 13}, {5, 1, 3, B, 4, D}, {5, 2, 3, B, 4, D}, {0},     {1, 13}, {1,  B},                                  {1,  B},                                  {1, B},       {1, B},       {1, B},       {0},                  {1, 13}, {8, 12, 3, B, 4, 3, B, 4, D}, {1, 13}},
-                            {{1, 13}, {0},                {0},                {1, 13}, {1, 13}, {1,  13},                                 {3,  B, D, C},                            {3, B, D, C}, {3, B, D, C}, {3, B, D, C}, {3, B,  D, C},        {1, 13}, {0},                          {1, 13}}};
+                            {{0},     {0},                {0},                {0}, {0},     {11, 5, 3, B, 4, 3, B, 4, 3, B, 4, D}, {11, 6, 3, B, 4, 3, B, 4, 3, B, 4, D}, {2, 7, D}, {2, 8, D}, {2, 9, D}, {4, 10, B, 11, D}, {0},     {0},                          {0}},
+                            {{1, 13}, {5, 1, 3, B, 4, D}, {5, 2, 3, B, 4, D}, {0}, {1, 13}, {2,  B, D},                            {2,  B, D},                            {2, B, D}, {2, B, D}, {2, B, D}, {2, B,  D},        {1, 13}, {8, 12, 3, B, 4, 3, B, 4, D}, {1, 13}}};
     int stack[100], height = -1, i = 0, temp, length;
     bool flag = true;
     stack[++height] = S;
     while (height >= 0) {
-        if ((stack[height]) > 19) {
-            if (table[stack[height] - 20][*num][0] == 0) {
+        if ((stack[height]) >= S) {
+            if (table[stack[height] - S][*num][0] == 0) {
                 printf("error!\n");
                 return false;
             } else {
-                temp = stack[height] - 20;
-                printf("%s --> ", map[temp + 20]);
+                temp = stack[height] - S;
+                printf("%s → ", map[temp + S]);
                 stack[height--] = 0;
                 length = table[temp][*num][0];
                 for (i = length; i > 0; i--) {
@@ -220,7 +217,6 @@ bool match(int *num) {
                 printf("\n");
             }
         } else {
-
             if (stack[height] == *num) {
                 print_info(stack, num, flag);
                 flag = false;
@@ -239,7 +235,7 @@ bool match(int *num) {
 
         }
     }
-    return height == -1 ;
+    return height == -1;
 }
 
 bool cifa_wenfa(char *s, char *split, int num[][100]) {
@@ -257,7 +253,7 @@ bool cifa_wenfa(char *s, char *split, int num[][100]) {
                         {"("},
                         {")"},
                         {"_^"},
-                        {"E"},
+                        {"ε"},
                         {""},
                         {""},
                         {""},
@@ -266,8 +262,7 @@ bool cifa_wenfa(char *s, char *split, int num[][100]) {
                         {""},
                         {"S"},
                         {"B"},
-                        {"D"},
-                        {"C"}};
+                        {"D"}};
     char testfile[] = "../information/test/test00.txt";
     for (int i = 1; i < 100; i++) {
         testfile[24] = char(i / 10 + '0');
@@ -287,10 +282,10 @@ bool cifa_wenfa(char *s, char *split, int num[][100]) {
          * */
         char dict[] = "$:0  _:1     ^:2     {:3     }:4  \\int:5   \\sum:6"
                       "    \\blank:7 id:8 num:9   (:10    ):11      _^:12"
-                      "     epsilon(E):13";
+                      "     epsilon(ε):13";
         char *result = check(s, num[i], split);
         if (result == nullptr) {
-            printf("%s\n$\t", dict);
+            printf("$\t");
             int j = 0;
             do {
                 j++;
@@ -300,7 +295,8 @@ bool cifa_wenfa(char *s, char *split, int num[][100]) {
             if (match(num[i])) {
                 printf("Congratulations! Match succeed!\n\n");
             } else {
-                printf("Something error!\n\n");
+//                printf("Something error!\n\n");
+                printf("\n\n");
             }
         } else {
             printf("last matched: ");
@@ -317,7 +313,6 @@ bool cifa_wenfa(char *s, char *split, int num[][100]) {
     }
     return true;
 }
-
 
 int main() {
     char s[100];
