@@ -183,7 +183,7 @@ bool superscript(const int father[6], int child[6]) {
 
 bool subscript(const int father[6], int child[6]) {
     child[2] = int(father[2] * 0.6);
-    child[1] = int(father[1] + child[2]);
+    child[1] = int(father[1] + father[2] - child[2]*0.5);
     return true;
 }
 
@@ -428,22 +428,11 @@ bool match(int num[100][6], const char *split) {
                 father[3] = stack[height][3];
                 father[5] = stack[height][5];
                 temp = stack[height][0] - S;
-//                printf("%s → ", map[temp + S]);
                 stack[height--][0] = 0;
                 length = table[temp][*num[0]][0];
-
-//                (*p)[0]=temp+S;
-//                (*p)[1]=table[temp][*num[0]][length+1];
-//                p++;
-
                 for (i = length; i > 0; i--) {
                     stack[++height][0] = table[temp][*num[0]][i];
-//                    inherit(table[temp][*num[0]], stack[height - 1]);
                 }
-//                for (i = 0; i < table[temp][*num[0]][0]; i++) {
-//                    printf("%s ", map[stack[height - i][0]]);
-//                }
-//                printf("\n");
                 switch (table[temp][*num[0]][length + 1]) {
                     case 1:
                         stack[height - 1][1] = 175;
@@ -533,39 +522,16 @@ bool match(int num[100][6], const char *split) {
             }
         } else {
             if (stack[height][0] == *num[0]) {
-//                index = 0;
-//                while (*split++ != '\t' && (*num[0] || flag)) {
-//                    count++;
-//                    index++;
-//                }
                 inherit(stack[height], *num);
                 (*num)[3] = stack[height][3];
                 (*num)[5] = stack[height][5];
-//                (*num)[4] = count++ - index;
-//                if((*num)[0]==5||(*num)[0]==6){
-//                    (*num)[3] = ((*num)[2]);
-//                } else{
-//                    (*num)[3] = index * ((*num)[2]);
-//                }
-                if(**num>=5&&**num<=11||**num==13){
+                if (**num >= 5 && **num <= 11 || **num == 13) {
                     p++;
                 }
-//                (*num)[3] = index * ((*num)[2]);
-//                print_info(stack, num, flag);
-//                flag = false;
-//                stack[height--][0] = 0;
                 height--;
-//                if (**num>=5&&**num<=11||**num==13){
-//                    (*p)[0]=**num;
-//                    (*p)[2]=(*num)[3];
-//                    p++;
-//                }
-
                 num++;
             } else {
                 if (stack[height][0] == 13) {
-//                    print_info(stack, num, flag);
-                    flag = false;
                     stack[height--][0] = 0;
                 } else {
                     printf("Match error!\n");
@@ -587,7 +553,7 @@ bool zhidao(const char *split, int num[100][6], FILE *fp) {
                    "<body>";
     char end[] = "</body>\n"
                  "</html>";
-    int left = 500, index;
+    int index;
     fprintf(fp, "%s", start);
     //  Σ: &sum;  ∫: &int;
     num++;
@@ -605,26 +571,23 @@ bool zhidao(const char *split, int num[100][6], FILE *fp) {
             case 11:
                 fprintf(fp,
                         "<div style=\"position: absolute; top:%dpx; left:%dpx;\"><span style=\"font-size:%dpx; font-style:oblique; line-\n"
-                        "height:100%c;\">%s</span></div>\n", (*num)[1], (*num)[5]/2, (*num)[2], '%',
+                        "height:100%c;\">%s</span></div>\n", (*num)[1], 250 + (*num)[5] / 2, (*num)[2], '%',
                         map[(*num)[0]]);
-//                left = (*num)[5];
                 break;
             case 7:
                 fprintf(fp,
                         "<div style=\"position: absolute; top:%dpx; left:%dpx;\"><span style=\"font-size:%dpx; font-style:oblique; line-\n"
-                        "height:100%c;\"> </span></div>\n", (*num)[1] + (*num)[5]/2, (*num)[5], (*num)[2], '%');
-//                left = (*num)[5];
+                        "height:100%c;\"> </span></div>\n", (*num)[1] + 250 + (*num)[5] / 2, (*num)[5], (*num)[2], '%');
                 break;
             case 8:
             case 9:
                 fprintf(fp,
                         "<div style=\"position: absolute; top:%dpx; left:%dpx;\"><span style=\"font-size:%dpx; font-style:oblique; line-\n"
-                        "height:100%c;\">", (*num)[1], (*num)[5]/2, (*num)[2], '%');
+                        "height:100%c;\">", (*num)[1], 250 + (*num)[5] / 2, (*num)[2], '%');
                 for (index = ((*num)[4]); split[index] != '\t'; index++) {
                     fprintf(fp, "%c", split[index]);
                 }
                 fprintf(fp, "%s", "</span></div>\n");
-//                left = (*num)[3];
                 break;
             default:
                 break;
@@ -639,7 +602,7 @@ bool cifa_wenfa(char *s, char *split, int num[][100][6]) {
     FILE *fp;
     char testfile[] = "../information/test/test00.txt";
     char resultfile[] = "../information/result/test00.html";
-    for (int i = 5; i < 100; i++) {
+    for (int i = 1; i < 100; i++) {
         testfile[24] = char(i / 10 + '0');
         resultfile[26] = char(i / 10 + '0');
         testfile[25] = char(i % 10 + '0');
