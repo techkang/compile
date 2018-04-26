@@ -30,7 +30,7 @@ char map[25][10] = {{"$"},
                     {"D"},
                     {"C"}};
 
-char *check(char *s, int num[100][5], char *split) {
+char *check(char *s, int num[100][6], char *split) {
     if (*(s) != '$') {
         return s;
     }
@@ -146,7 +146,7 @@ char *check(char *s, int num[100][5], char *split) {
     return nullptr;
 }
 
-bool print_info(int stack[100][5], int num[100][5], const bool flag) {
+bool print_info(int stack[100][6], int num[100][6], const bool flag) {
     printf("%s ", map[*stack[0]]);
     stack++;
     while (*stack[0]) {
@@ -167,7 +167,7 @@ bool print_info(int stack[100][5], int num[100][5], const bool flag) {
     printf("\n");
 }
 
-bool inherit(const int father[5], int child[5]) {
+bool inherit(const int father[6], int child[6]) {
     int i = 1;
     for (; i < 3; i++) {
         child[i] = father[i];
@@ -175,26 +175,26 @@ bool inherit(const int father[5], int child[5]) {
     return true;
 }
 
-bool superscript(const int father[5], int child[5]) {
+bool superscript(const int father[6], int child[6]) {
     child[2] = int(father[2] * 0.6);
     child[1] = int(-child[2] * 0.5 + father[1]);
     return true;
 }
 
-bool subscript(const int father[5], int child[5]) {
+bool subscript(const int father[6], int child[6]) {
     child[2] = int(father[2] * 0.6);
     child[1] = int(father[1] + child[2]);
     return true;
 }
 
 
-int max(int a,int b){
-    return a>b?a:b;
+int max(int a, int b) {
+    return a > b ? a : b;
 }
 
-int next(int (*p)[3],int a){
-    while(**p){
-        if (**p==a){
+int next(int (*p)[3], int a) {
+    while (**p) {
+        if (**p == a) {
             return (*p)[2];
         }
         p++;
@@ -203,7 +203,7 @@ int next(int (*p)[3],int a){
 }
 
 
-bool match(int num[100][5], const char *split) {
+bool match(int num[100][6], const char *split) {
     /* $:0  _:1     ^:2     {:3
      * }:4  \int:5   \sum:6    \blank:7
      * id:8 num:9   (:10    ):11    _^:12   epsilon:13
@@ -225,8 +225,8 @@ bool match(int num[100][5], const char *split) {
     int table[4][14][14] = {{{3, 0, B, 0, 1}},
                             {{0},     {0},                   {0},                   {0}, {0},     {11, 5, 3, B, 4, 3, B, 4, 3, B, 4, D, 2}, {11, 6, 3, B, 4, 3, B, 4, 3, B, 4, D, 3}, {2, 7, D, 4},  {2, 8, D, 5},  {2, 9, D, 6},  {4, 10, B, 11, D, 7}, {0},     {0},                              {0}},
                             {{1, 13}, {5, 1, 3, B, 4, D, 8}, {5, 2, 3, B, 4, D, 9}, {0}, {1, 13}, {2,  B, D, 10},                           {2,  B, D, 10},                           {2, B, D, 10}, {2, B, D, 10}, {2, B, D, 10}, {2, B,  D, 10},       {1, 13}, {8, 12, 3, B, 4, 3, B, 4, D, 11}, {1, 13}}};
-    int stack[100][5] = {0},ally[100][3], (*p)[3]=ally,(*q)[3],father[5],(*num_head)[5]=num;
-    int height = -1, i = 0, temp, temp2,length,  index,left=0, count = 0;
+    int stack[100][6] = {0}, ally[100][3] = {0}, (*p)[3] = ally, (*q)[3], father[6] = {0}, (*num_head)[6] = num;
+    int height = -1, i = 0, temp, temp2, length, index, left = 0, count = 0;
     bool flag = true;
     stack[++height][0] = S;
     while (height >= 0) {
@@ -241,8 +241,8 @@ bool match(int num[100][5], const char *split) {
                 stack[height--][0] = 0;
                 length = table[temp][*num[0]][0];
 
-                (*p)[0]=temp+S;
-                (*p)[1]=table[temp][*num[0]][length+1];
+                (*p)[0] = temp + S;
+                (*p)[1] = table[temp][*num[0]][length + 1];
                 p++;
 
                 for (i = length; i > 0; i--) {
@@ -308,18 +308,18 @@ bool match(int num[100][5], const char *split) {
                 }
                 inherit(stack[height], *num);
                 (*num)[4] = count++ - index;
-                if((*num)[0]==5||(*num)[0]==6){
+                if ((*num)[0] == 5 || (*num)[0] == 6) {
                     (*num)[3] = ((*num)[2]);
-                } else{
+                } else {
                     (*num)[3] = index * ((*num)[2]);
                 }
                 print_info(stack, num, flag);
                 flag = false;
                 stack[height--][0] = 0;
 
-                if (**num>=5&&**num<=11||**num==13){
-                    (*p)[0]=**num;
-                    (*p)[2]=(*num)[3];
+                if (**num >= 5 && **num <= 11 || **num == 13) {
+                    (*p)[0] = **num;
+                    (*p)[2] = (*num)[3];
                     p++;
                 }
 
@@ -337,62 +337,75 @@ bool match(int num[100][5], const char *split) {
 
         }
     }
-    if( height != -1){
+    if (height != -1) {
         return false;
     }
-/*
-    while (--p!=ally){
-        q=p;
-        switch (**p){
+
+    while (--p != ally) {
+        q = p;
+        switch (**p) {
             case B:
-                switch ((*p)[1]){
+                switch ((*p)[1]) {
                     case 2:
-                        temp=next(q,B);
-                        while (**q!=B){
+                        q++;
+                        temp = next(q, B);
+                        while (**q != B) {
                             q++;
                         }
                         q++;
-                        (*p)[2]=max(temp,next(q,B))+next(q,B)+next(q,D)+next(q,5);
+                        temp2 = next(q, B);
+                        while (**q != B) {
+                            q++;
+                        }
+                        q++;
+                        (*p)[2] = max(temp, temp2) + next(q, B) + next(q, D) + next(p, 5);
                         break;
                     case 3:
-                        temp=next(q,B);
-                        while (**q!=B){
+                        q++;
+                        temp = next(p, B);
+                        while (**q != B) {
                             q++;
                         }
                         q++;
-                        temp2=next(q,B);
-                        while (**q!=B){
+                        temp2 = next(q, B);
+                        while (**q != B) {
                             q++;
                         }
                         q++;
-                        (*p)[2]=max(temp,temp2)+next(q,B)+next(q,D)+next(p,6);
+                        (*p)[2] = max(temp, temp2) + next(q, B) + next(q, D) + next(p, 6);
                         break;
-                    case 4:(*p)[2]=next(q,7)+next(q,D);
+                    case 4:
+                        (*p)[2] = next(q, 7) + next(q, D);
                         break;
-                    case 5:(*p)[2]=next(q,8)+next(q,D);
+                    case 5:
+                        (*p)[2] = next(q, 8) + next(q, D);
                         break;
-                    case 6:(*p)[2]=next(q,9)+next(q,D);
+                    case 6:
+                        (*p)[2] = next(q, 9) + next(q, D);
                         break;
-                    case 7:(*p)[2]=next(q,10)+next(q,B)+next(q,11)+next(q,D);
+                    case 7:
+                        (*p)[2] = next(q, 10) + next(q, B) + next(q, 11) + next(q, D);
                         break;
                     default:
                         break;
                 }
             case D:
-                switch ((*p)[1]){
+                switch ((*p)[1]) {
                     case 8:
                     case 9:
                     case 10:
-                        (*p)[2]=next(q,B)+next(q,D);
+                        (*p)[2] = next(q, B) + next(q, D);
                         break;
                     case 11:
-                        temp=next(q,B);
-                        while (**q!=B){
+                        temp = next(q, B);
+                        while (**q != B) {
                             q++;
                         }
                         q++;
-                        (*p[2])=max(temp,next(q,B))+next(q,D);
+                        (*p[2]) = max(temp, next(q, B)) + next(q, D);
                         break;
+                    case 13:
+                        (*p[2]) = 0;
                     default:
                         break;
                 }
@@ -400,17 +413,20 @@ bool match(int num[100][5], const char *split) {
                 break;
         }
     }
-    num=num_head;
+    num = num_head;
 
     stack[++height][0] = S;
     while (height >= 0) {
-        q=p;
+        q = p;
         if ((stack[height][0]) >= S) {
+            p++;
             if (table[stack[height][0] - S][*num[0]][0] == 0) {
                 printf("error!\n");
                 return false;
             } else {
                 inherit(stack[height], father);
+                father[3] = stack[height][3];
+                father[5] = stack[height][5];
                 temp = stack[height][0] - S;
 //                printf("%s → ", map[temp + S]);
                 stack[height--][0] = 0;
@@ -433,89 +449,107 @@ bool match(int num[100][5], const char *split) {
                         stack[height - 1][1] = 175;
                         stack[height - 1][2] = 50;
                         stack[height - 1][3] = 0;
+                        stack[height - 1][5] = 500;
                         break;
                     case 2:
                     case 3:
-                        inherit(father, stack[height]);
                         p++;
-                        stack[height][3]=(*p)[2];
+                        inherit(father, stack[height]);
                         subscript(father, stack[height - 2]);
-                        temp=next(q,B);
                         superscript(father, stack[height - 5]);
-                        while (**q!=B){
-                            q++;
-                        }
-                        q++;
-                        temp2=next(q,B);
-                        stack[height-5][2]=stack[height-2][2]=max(temp,temp2);
                         inherit(father, stack[height - 8]);
-                        while (**q!=B){
+                        inherit(father, stack[height - 10]);
+                        left = stack[height][5] = father[5];
+                        left += next(q, table[temp][*num[0]][length + 1] + 3);
+                        stack[height - 2][5] = stack[height - 5][5] = left;
+                        temp = next(q, B);
+                        while (**q != B) {
                             q++;
                         }
                         q++;
-                        stack[height-8][3]=next(q,B);
-                        inherit(father, stack[height - 10]);
-                        stack[height-10][3]=next(q,D);
+                        temp2 = next(q, B);
+                        left += max(temp, temp2);
+                        stack[height - 8][5] = left;
+                        while (**q != B) {
+                            q++;
+                        }
+                        q++;
+                        left += next(q, B);
+                        stack[height - 10][5] = left;
                         break;
                     case 4:
                     case 5:
                     case 6:
                         inherit(father, stack[height]);
-                        stack[height][2]=next(q,(**q)+3);
                         inherit(father, stack[height - 1]);
-                        stack[height-1][2]=next(q,D);
+                        stack[height][5] = father[5];
+                        stack[height - 1][5] = father[5] + next(q, table[temp][*num[0]][length + 1] + 3);
                         break;
                     case 7:
                         inherit(father, stack[height]);
-                        stack[height][2]=next(q,10);
                         inherit(father, stack[height - 1]);
-                        stack[height-1][2]=next(q,B);
                         inherit(father, stack[height - 2]);
-                        stack[height-2][2]=next(q,11);
                         inherit(father, stack[height - 3]);
-                        stack[height-3][2]=next(q,D);
+                        left = stack[height][5] = father[5];
+                        left += next(q, 10);
+                        stack[height - 1][5] = left;
+                        left += next(q, B);
+                        stack[height - 2][5] = left;
+                        left += next(q, 11);
+                        stack[height - 3][5] = left;
                         break;
                     case 8:
                         subscript(father, stack[height - 2]);
                         inherit(father, stack[height - 4]);
-                        stack[height-2][2]=next(q,B);
-                        stack[height-4][2]=next(q,D);
+                        stack[height - 2][5] = father[5];
+                        stack[height - 4][5] = father[5] + next(q, B);
                         break;
                     case 9:
                         superscript(father, stack[height - 2]);
                         inherit(father, stack[height - 4]);
-                        stack[height-2][2]=next(q,B);
-                        stack[height-4][2]=next(q,D);
+                        stack[height - 2][5] = father[5];
+                        stack[height - 4][5] = father[5] + next(q, B);
                         break;
                     case 10:
                         inherit(father, stack[height]);
                         inherit(father, stack[height - 1]);
-                        stack[height][2]=next(q,B);
-                        stack[height-1][2]=next(q,D);
+                        stack[height][5] = father[5];
+                        stack[height - 1][5] = father[5] + next(q, B);
                         break;
                     case 11:
                         subscript(father, stack[height - 2]);
                         superscript(father, stack[height - 5]);
                         inherit(father, stack[height - 7]);
+                        temp = next(q, B);
+                        while (**q != B) {
+                            q++;
+                        }
+                        q++;
+                        stack[height - 2][5] = stack[height - 5][5] = father[5];
+                        stack[height - 7][5] = father[5] + max(temp, next(q, B));;
                     default:
                         break;
                 }
             }
         } else {
             if (stack[height][0] == *num[0]) {
-                (*num)[3]=stack[height][3];
 //                index = 0;
 //                while (*split++ != '\t' && (*num[0] || flag)) {
 //                    count++;
 //                    index++;
 //                }
-//                inherit(stack[height], *num);
+                inherit(stack[height], *num);
+                (*num)[3] = stack[height][3];
+                (*num)[5] = stack[height][5];
 //                (*num)[4] = count++ - index;
 //                if((*num)[0]==5||(*num)[0]==6){
 //                    (*num)[3] = ((*num)[2]);
 //                } else{
 //                    (*num)[3] = index * ((*num)[2]);
 //                }
+                if(**num>=5&&**num<=11||**num==13){
+                    p++;
+                }
 //                (*num)[3] = index * ((*num)[2]);
 //                print_info(stack, num, flag);
 //                flag = false;
@@ -541,12 +575,11 @@ bool match(int num[100][5], const char *split) {
 
         }
     }
-    */
     return true;
 
 }
 
-bool zhidao(const char *split, int num[100][5], FILE *fp) {
+bool zhidao(const char *split, int num[100][6], FILE *fp) {
     char start[] = "<html>\n"
                    "<head>\n"
                    "<META content=\"text/html; charset=gb2312\">\n"
@@ -572,25 +605,26 @@ bool zhidao(const char *split, int num[100][5], FILE *fp) {
             case 11:
                 fprintf(fp,
                         "<div style=\"position: absolute; top:%dpx; left:%dpx;\"><span style=\"font-size:%dpx; font-style:oblique; line-\n"
-                        "height:100%c;\">%s</span></div>\n", (*num)[1], left, (*num)[2], '%', map[(*num)[0]]);
-                left += (*num)[3] / 2;
+                        "height:100%c;\">%s</span></div>\n", (*num)[1], (*num)[5]/2, (*num)[2], '%',
+                        map[(*num)[0]]);
+//                left = (*num)[5];
                 break;
             case 7:
                 fprintf(fp,
                         "<div style=\"position: absolute; top:%dpx; left:%dpx;\"><span style=\"font-size:%dpx; font-style:oblique; line-\n"
-                        "height:100%c;\"> </span></div>\n", (*num)[1], left, (*num)[2], '%');
-                left += (*num)[3] / 2;
+                        "height:100%c;\"> </span></div>\n", (*num)[1] + (*num)[5]/2, (*num)[5], (*num)[2], '%');
+//                left = (*num)[5];
                 break;
             case 8:
             case 9:
                 fprintf(fp,
                         "<div style=\"position: absolute; top:%dpx; left:%dpx;\"><span style=\"font-size:%dpx; font-style:oblique; line-\n"
-                        "height:100%c;\">", (*num)[1], left, (*num)[2], '%');
+                        "height:100%c;\">", (*num)[1], (*num)[5]/2, (*num)[2], '%');
                 for (index = ((*num)[4]); split[index] != '\t'; index++) {
                     fprintf(fp, "%c", split[index]);
                 }
                 fprintf(fp, "%s", "</span></div>\n");
-                left += (*num)[3] / 2;
+//                left = (*num)[3];
                 break;
             default:
                 break;
@@ -601,7 +635,7 @@ bool zhidao(const char *split, int num[100][5], FILE *fp) {
     return true;
 }
 
-bool cifa_wenfa(char *s, char *split, int num[][100][5]) {
+bool cifa_wenfa(char *s, char *split, int num[][100][6]) {
     FILE *fp;
     char testfile[] = "../information/test/test00.txt";
     char resultfile[] = "../information/result/test00.html";
@@ -659,7 +693,7 @@ bool cifa_wenfa(char *s, char *split, int num[][100][5]) {
 int main() {
     char s[100];
     char split[200] = "";
-    int num[100][100][5];
+    int num[100][100][6];
     cifa_wenfa(s, split, num);
     return 0;
 }
