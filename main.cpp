@@ -306,6 +306,7 @@ bool match(int num[100][6], const char *split) {
                     count++;
                     index++;
                 }
+
                 inherit(stack[height], *num);
                 (*num)[4] = count++ - index;
                 if ((*num)[0] == 5 || (*num)[0] == 6) {
@@ -313,15 +314,17 @@ bool match(int num[100][6], const char *split) {
                 } else {
                     (*num)[3] = index * ((*num)[2]);
                 }
-                print_info(stack, num, flag);
-                flag = false;
-                stack[height--][0] = 0;
 
                 if (**num >= 5 && **num <= 11 || **num == 13) {
                     (*p)[0] = **num;
                     (*p)[2] = (*num)[3];
                     p++;
                 }
+
+                print_info(stack, num, flag);
+                flag = false;
+                stack[height--][0] = 0;
+
 
                 num++;
             } else {
@@ -542,7 +545,6 @@ bool match(int num[100][6], const char *split) {
         }
     }
     return true;
-
 }
 
 bool zhidao(const char *split, int num[100][6], FILE *fp) {
@@ -567,19 +569,32 @@ bool zhidao(const char *split, int num[100][6], FILE *fp) {
                 break;
             case 5:
             case 6:
+                fprintf(fp,
+                        "<div style=\"position: absolute; top:%dpx; left:%dpx;\"><span style=\"font-size:%dpx; font-style:normal; line-\n"
+                        "height:100%c;\">%s</span></div>\n", (*num)[1], 250 + (*num)[5] / 2, (*num)[2], '%',
+                        map[(*num)[0]]);
+                break;
             case 10:
             case 11:
                 fprintf(fp,
-                        "<div style=\"position: absolute; top:%dpx; left:%dpx;\"><span style=\"font-size:%dpx; font-style:oblique; line-\n"
+                        "<div style=\"position: absolute; top:%dpx; left:%dpx;\"><span style=\"font-size:%dpx; font-style:normal; line-\n"
                         "height:100%c;\">%s</span></div>\n", (*num)[1], 250 + (*num)[5] / 2, (*num)[2], '%',
                         map[(*num)[0]]);
                 break;
             case 7:
                 fprintf(fp,
-                        "<div style=\"position: absolute; top:%dpx; left:%dpx;\"><span style=\"font-size:%dpx; font-style:oblique; line-\n"
+                        "<div style=\"position: absolute; top:%dpx; left:%dpx;\"><span style=\"font-size:%dpx; font-style:normal; line-\n"
                         "height:100%c;\"> </span></div>\n", (*num)[1] + 250 + (*num)[5] / 2, (*num)[5], (*num)[2], '%');
                 break;
             case 8:
+                fprintf(fp,
+                        "<div style=\"position: absolute; top:%dpx; left:%dpx;\"><span style=\"font-size:%dpx; font-style:normal; line-\n"
+                        "height:100%c;\">", (*num)[1], 250 + (*num)[5] / 2, (*num)[2], '%');
+                for (index = ((*num)[4]); split[index] != '\t'; index++) {
+                    fprintf(fp, "%c", split[index]);
+                }
+                fprintf(fp, "%s", "</span></div>\n");
+                break;
             case 9:
                 fprintf(fp,
                         "<div style=\"position: absolute; top:%dpx; left:%dpx;\"><span style=\"font-size:%dpx; font-style:oblique; line-\n"
